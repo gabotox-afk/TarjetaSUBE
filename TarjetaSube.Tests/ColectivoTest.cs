@@ -24,10 +24,11 @@ namespace TarjetaSube.Tests
         public void PagarCon_SaldoInsuficiente_DevuelveNullYNoDescuentaSaldo()
         {
             var colectivo = new Colectivo("144 Negra");
-            var tarjeta = new Tarjeta(1000);
+            var tarjeta = new Tarjeta();
+            colectivo.PagarCon(tarjeta);
             Boleto? boleto = colectivo.PagarCon(tarjeta);
             Assert.That(boleto, Is.Null);
-            Assert.That(tarjeta.Saldo, Is.EqualTo(1000));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
         }
         [Test]
         public void PagarCon_TarjetaNull_LanzaArgumentNullException()
