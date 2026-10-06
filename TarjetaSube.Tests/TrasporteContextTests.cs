@@ -59,5 +59,25 @@ namespace TarjetaSube.Tests
             Assert.That(boletoGuardado.Tarifa, Is.EqualTo(1580));
             Assert.That(boletoGuardado.SaldoRestante, Is.EqualTo(3420));
         }
+        [Test]
+        public void EnsureCreated_CargaLosCuatroTiposDeTarjeta()
+        {
+            _db.Database.EnsureCreated();
+            Assert.That(_db.TarjetaTipos.Count(), Is.EqualTo(4));
+            Assert.That(_db.TarjetaTipos.Find(TarjetaTipo.MedioBoletoEstudiantilId)!.PorcentajeDescuento, Is.EqualTo(50));
+            Assert.That(_db.TarjetaTipos.Find(TarjetaTipo.FranquiciaCompletaId)!.PorcentajeDescuento, Is.EqualTo(100));
+        }
+        [Test]
+        public void GuardarTarjetaConTipo_PersisteLaClaveForanea()
+        {
+            _db.Database.EnsureCreated();
+            var medioBoleto = _db.TarjetaTipos.Find(TarjetaTipo.MedioBoletoEstudiantilId)!;
+            var tarjeta = new Tarjeta(5000, medioBoleto);
+            _db.Tarjetas.Add(tarjeta);
+            _db.SaveChanges();
+            var tarjetaGuardada = _db.Tarjetas.Find(tarjeta.Id);
+            Assert.That(tarjetaGuardada!.TarjetaTipoId, Is.EqualTo(TarjetaTipo.MedioBoletoEstudiantilId));
+            Assert.That(tarjetaGuardada.TarjetaTipo!.Nombre, Is.EqualTo("Medio boleto estudiantil"));
+        }
     }
 }

@@ -28,13 +28,15 @@ namespace TarjetaSube
                 throw new ArgumentNullException(nameof(tarjeta));
             }
 
-            if (!tarjeta.Descontar(Tarifa))
+            decimal montoAPagar = tarjeta.CalcularPasaje(Tarifa);
+
+            if (!tarjeta.Descontar(montoAPagar))
             {
 
                 return null;
             }
 
-            return new Boleto(this, tarjeta, Tarifa, tarjeta.Saldo);
+            return new Boleto(this, tarjeta, montoAPagar, tarjeta.Saldo);
 
         }
         public Boleto? pagarCon(Tarjeta tarjeta) => PagarCon(tarjeta);
