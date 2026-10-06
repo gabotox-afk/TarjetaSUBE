@@ -66,7 +66,7 @@ namespace TarjetaSube.Tests
         public void Descontar_SaldoInsuficiente_NoDescuentaYDevuelveFalse()
         {
             var tarjeta = new Tarjeta(1000);
-            bool resultado = tarjeta.Descontar(1580);
+            bool resultado = tarjeta.Descontar(3500);
             Assert.That(resultado, Is.False);
             Assert.That(tarjeta.Saldo, Is.EqualTo(1000));
         }
@@ -79,6 +79,36 @@ namespace TarjetaSube.Tests
             bool resultado = tarjeta.Descontar(-500);
             Assert.That(resultado, Is.False);
             Assert.That(tarjeta.Saldo, Is.EqualTo(1000));
+        }
+
+        [Test]
+
+        public void Descontar_SuperaSaldoNegativoPermitido_NoDescuentaYDevuelveFalse()
+        {
+            var tarjeta = new Tarjeta();
+
+            Assert.That(tarjeta.Descontar(1580), Is.True);
+            Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
+
+            Assert.That(tarjeta.Descontar(1580), Is.False);
+            Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
+            Assert.That(tarjeta.Saldo, Is.GreaterThanOrEqualTo(-Tarjeta.SaldoNegativoPermitido));
+        }
+
+        [Test]
+
+        public void Cargar_ConSaldoNegativo_DescuentaLosViajesPlus()
+        {
+            var tarjeta = new Tarjeta(1000);
+            var colectivo = new Colectivo("122 Verde");
+
+            Boleto? boleto = colectivo.PagarCon(tarjeta);
+            Assert.That(boleto, Is.Not.Null);
+            Assert.That(tarjeta.Saldo, Is.EqualTo(-580));
+
+            tarjeta.Cargar(3000);
+
+            Assert.That(tarjeta.Saldo, Is.EqualTo(3000 - 580));
         }
     }
 }

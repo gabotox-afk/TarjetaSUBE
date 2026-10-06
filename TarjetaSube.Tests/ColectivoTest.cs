@@ -24,10 +24,11 @@ namespace TarjetaSube.Tests
         public void PagarCon_SaldoInsuficiente_DevuelveNullYNoDescuentaSaldo()
         {
             var colectivo = new Colectivo("144 Negra");
-            var tarjeta = new Tarjeta(1000);
+            var tarjeta = new Tarjeta();
+            colectivo.PagarCon(tarjeta);
             Boleto? boleto = colectivo.PagarCon(tarjeta);
             Assert.That(boleto, Is.Null);
-            Assert.That(tarjeta.Saldo, Is.EqualTo(1000));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
         }
         [Test]
         public void PagarCon_TarjetaNull_LanzaArgumentNullException()
@@ -47,11 +48,11 @@ namespace TarjetaSube.Tests
         [Test]
         public void pagarCon_SaldoInsuficiente_DevuelveFalseYNoDescuentaSaldo()
         {
-            var colectivo = new Colectivo("115");
-            var tarjeta = new Tarjeta(1000);
+            var colectivo = new Colectivo("115", 2500);
+            var tarjeta = new Tarjeta();
             bool resultado = colectivo.pagarCon(tarjeta);
             Assert.That(resultado, Is.False);
-            Assert.That(tarjeta.Saldo, Is.EqualTo(1000));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(0));
         }
         [Test]
         public void pagarCon_TarjetaSeQuedaSinSaldo_DevuelveFalse()
@@ -60,8 +61,10 @@ namespace TarjetaSube.Tests
             var tarjeta = new Tarjeta(1580);
             Assert.That(colectivo.pagarCon(tarjeta), Is.True);
             Assert.That(tarjeta.Saldo, Is.EqualTo(0));
+            Assert.That(colectivo.pagarCon(tarjeta), Is.True);
+            Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
             Assert.That(colectivo.pagarCon(tarjeta), Is.False);
-            Assert.That(tarjeta.Saldo, Is.EqualTo(0));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
         }
         [Test]
         public void PagarCon_VariosViajes_DescuentaCadaTarifa()
@@ -72,8 +75,10 @@ namespace TarjetaSube.Tests
             colectivo.PagarCon(tarjeta);
             colectivo.PagarCon(tarjeta);
             Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 3 * 1580));
+            Assert.That(colectivo.PagarCon(tarjeta), Is.Not.Null);
+            Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 4 * 1580));
             Assert.That(colectivo.PagarCon(tarjeta), Is.Null);
-            Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 3 * 1580));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 4 * 1580));
         }
     }
 }
