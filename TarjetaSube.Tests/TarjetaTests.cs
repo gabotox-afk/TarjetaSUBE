@@ -72,6 +72,35 @@ namespace TarjetaSube.Tests
         }
 
         [Test]
+        public void CalcularPasaje_SinTipo_CobraTarifaCompleta()
+        {
+            var tarjeta = new Tarjeta(5000);
+            Assert.That(tarjeta.CalcularPasaje(1580), Is.EqualTo(1580));
+        }
+
+        [Test]
+        public void CalcularPasaje_ConTipo_UsaElDescuentoDelTipo()
+        {
+            var tarjeta = new Tarjeta(5000, new TarjetaTipo("Medio boleto estudiantil", 50));
+            Assert.That(tarjeta.CalcularPasaje(1580), Is.EqualTo(790));
+        }
+
+        [Test]
+        public void Constructor_ConTipo_AsignaTipoYClaveForanea()
+        {
+            var tipo = new TarjetaTipo("Franquicia completa", 100) { Id = TarjetaTipo.FranquiciaCompletaId };
+            var tarjeta = new Tarjeta(0, tipo);
+            Assert.That(tarjeta.TarjetaTipo, Is.SameAs(tipo));
+            Assert.That(tarjeta.TarjetaTipoId, Is.EqualTo(TarjetaTipo.FranquiciaCompletaId));
+        }
+
+        [Test]
+        public void Constructor_ConTipoNull_LanzaArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => new Tarjeta(0, null!));
+        }
+
+        [Test]
 
         public void Descontar_MontoNegativo_NoDescuentaYDevuelveFalse()
         {

@@ -45,6 +45,41 @@ namespace TarjetaSube.Tests
             Assert.That(resultado, Is.True);
             Assert.That(tarjeta.Saldo, Is.EqualTo(2000 - 1580));
         }
+
+        [Test]
+        public void PagarCon_FranquiciaCompleta_SiemprePuedePagar()
+        {
+            var colectivo = new Colectivo("K");
+            var franquiciaCompleta = new TarjetaTipo("Franquicia completa", 100);
+            var tarjeta = new Tarjeta(0, franquiciaCompleta);
+
+            for (int i = 0; i < 50; i++)
+            {
+                Boleto? boleto = colectivo.PagarCon(tarjeta);
+                Assert.That(boleto, Is.Not.Null);
+                Assert.That(boleto!.Tarifa, Is.EqualTo(0));
+            }
+            Assert.That(tarjeta.Saldo, Is.EqualTo(0));
+        }
+
+        [TestCase(1580)]
+        [TestCase(1000)]
+        [TestCase(2500)]
+        public void PagarCon_MedioBoleto_MontoEsSiempreLaMitadDelNormal(decimal tarifa)
+        {
+            var colectivo = new Colectivo("122 Verde", tarifa);
+            var tarjetaNormal = new Tarjeta(30000, new TarjetaTipo("Normal", 0));
+            var tarjetaMedio = new Tarjeta(30000, new TarjetaTipo("Medio boleto estudiantil", 50));
+
+            for (int i = 0; i < 5; i++)
+            {
+                Boleto? boletoNormal = colectivo.PagarCon(tarjetaNormal);
+                Boleto? boletoMedio = colectivo.PagarCon(tarjetaMedio);
+                Assert.That(boletoNormal, Is.Not.Null);
+                Assert.That(boletoMedio, Is.Not.Null);
+                Assert.That(boletoMedio!.Tarifa, Is.EqualTo(boletoNormal!.Tarifa / 2));
+            }
+        }
         [Test]
         public void pagarCon_SaldoInsuficiente_DevuelveFalseYNoDescuentaSaldo()
         {
