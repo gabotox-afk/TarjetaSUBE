@@ -70,5 +70,15 @@ namespace TarjetaSube.Tests
             Assert.That(resultado, Is.False);
             Assert.That(tarjeta.Saldo, Is.EqualTo(1000));
         }
+
+        [Test]
+
+        public void Descontar_MontoNegativo_NoDescuentaYDevuelveFalse()
+        {
+            var tarjeta = new Tarjeta(1000);
+            bool resultado = tarjeta.Descontar(-500);
+            Assert.That(resultado, Is.False);
+            Assert.That(tarjeta.Saldo, Is.EqualTo(1000));
+        }
     }
 }
