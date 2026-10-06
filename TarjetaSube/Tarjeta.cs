@@ -12,6 +12,7 @@ namespace TarjetaSube
         public int Id { get; set; }
         public decimal Saldo { get; private set; }
         public const decimal LimiteSaldo = 40000;
+        public const decimal SaldoNegativoPermitido = 2000;
         private static readonly List<decimal> CargasValidas = new List<decimal>() { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
 
         public int TarjetaTipoId { get; set; } = TarjetaTipo.NormalId;
@@ -68,7 +69,7 @@ namespace TarjetaSube
                 return false;
             }
             
-            if(Saldo < monto)
+            if(Saldo - monto < -SaldoNegativoPermitido)
             {
                 return false;
             }

@@ -39,6 +39,6 @@ namespace TarjetaSube
             return new Boleto(this, tarjeta, montoAPagar, tarjeta.Saldo);
 
         }
-        public Boleto? pagarCon(Tarjeta tarjeta) => PagarCon(tarjeta);
+        public bool pagarCon(Tarjeta tarjeta) => PagarCon(tarjeta) != null;
     }
 }
