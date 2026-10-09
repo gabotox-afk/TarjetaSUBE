@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
@@ -60,6 +60,21 @@ namespace TarjetaSube.Tests
                 Assert.That(boleto!.Tarifa, Is.EqualTo(0));
             }
             Assert.That(tarjeta.Saldo, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void PagarCon_FranquiciaCompleta_ConSaldoNegativo_SiemprePuedePagar()
+        {
+            var colectivo = new Colectivo("K");
+            var franquiciaCompleta = new TarjetaTipo("Franquicia completa", 100);
+            var tarjeta = new Tarjeta(0, franquiciaCompleta);
+            tarjeta.Descontar(2000); // Saldo negativo al limite (-2000)
+
+            Boleto? boleto = colectivo.PagarCon(tarjeta);
+
+            Assert.That(boleto, Is.Not.Null);
+            Assert.That(boleto!.Tarifa, Is.EqualTo(0));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(-2000));
         }
 
         [TestCase(1580)]

@@ -1,7 +1,7 @@
 # Trabajo Tarjeta 2026
 
 ## Integrantes del grupo
- - Moreno Gabril
+ - Moreno Gabriel
  - Ferrer Petit Manuel
 
 ## Aclaraciones
