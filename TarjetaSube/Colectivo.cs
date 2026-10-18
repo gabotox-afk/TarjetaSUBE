@@ -28,7 +28,14 @@ namespace TarjetaSube
                 throw new ArgumentNullException(nameof(tarjeta));
             }
 
-            decimal montoAPagar = tarjeta.CalcularPasaje(Tarifa);
+            DateTime fechaActual = Tiempo.Ahora;
+
+            if (!tarjeta.PuedeViajar(fechaActual))
+            {
+                return null;    
+            }
+
+            decimal montoAPagar = tarjeta.CalcularPasaje(Tarifa, fechaActual);
 
             decimal saldoPrevio = tarjeta.Saldo;
             decimal totalAbonado = montoAPagar;
@@ -42,6 +49,8 @@ namespace TarjetaSube
 
                 return null;
             }
+
+            tarjeta.RegistrarViaje(fechaActual);
 
             return new Boleto(this, tarjeta, montoAPagar, tarjeta.Saldo, totalAbonado);
 

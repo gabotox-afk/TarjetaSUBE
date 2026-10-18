@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace TarjetaSube
@@ -14,6 +15,8 @@ namespace TarjetaSube
         public const decimal LimiteSaldo = 40000;
         public const decimal SaldoNegativoPermitido = 2000;
         private static readonly List<decimal> CargasValidas = new List<decimal>() { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
+        public List<DateTime> Viajes { get; set; } = new();
+        public bool EsMedioBoleto => TarjetaTipo?.Id == TarjetaTipo.MedioBoletoEstudiantilId || (TarjetaTipo != null && TarjetaTipo.PorcentajeDescuento == 50);
 
         public int TarjetaTipoId { get; set; } = TarjetaTipo.NormalId;
         public TarjetaTipo? TarjetaTipo { get; set; }
@@ -39,10 +42,21 @@ namespace TarjetaSube
             TarjetaTipoId = tipo.Id;
         }
 
-        public decimal CalcularPasaje(decimal tarifa)
+        public decimal CalcularPasaje(decimal tarifa, DateTime? fecha = null)
         {
+            DateTime f = fecha ?? Tiempo.Ahora;
+
             if (TarjetaTipo == null)
                 return tarifa;
+
+            if (EsMedioBoleto)
+            {
+                int viajesHoy = Viajes.Count(v => v.Date == f.Date);
+                if (viajesHoy >= 2)
+                {
+                    return tarifa;
+                }
+            }
 
             return TarjetaTipo.CalcularPrecio(tarifa);
         }
@@ -81,6 +95,24 @@ namespace TarjetaSube
 
             Saldo -= monto;
             return true;
+        }
+
+        public bool PuedeViajar(DateTime fecha)
+        {
+            if (EsMedioBoleto && Viajes.Count > 0)
+            {
+                DateTime ultimoViaje = Viajes.Last();
+                if ((fecha - ultimoViaje).TotalMinutes < 5)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public void RegistrarViaje(DateTime fecha)
+        {
+            Viajes.Add(fecha);
         }
     }
 }

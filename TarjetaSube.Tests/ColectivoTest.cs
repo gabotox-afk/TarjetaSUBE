@@ -83,11 +83,12 @@ namespace TarjetaSube.Tests
         public void PagarCon_MedioBoleto_MontoEsSiempreLaMitadDelNormal(decimal tarifa)
         {
             var colectivo = new Colectivo("122 Verde", tarifa);
-            var tarjetaNormal = new Tarjeta(30000, new TarjetaTipo("Normal", 0));
-            var tarjetaMedio = new Tarjeta(30000, new TarjetaTipo("Medio boleto estudiantil", 50));
 
             for (int i = 0; i < 5; i++)
             {
+                var tarjetaNormal = new Tarjeta(30000, new TarjetaTipo("Normal", 0));
+                var tarjetaMedio = new Tarjeta(30000, new TarjetaTipo("Medio boleto estudiantil", 50));
+                    
                 Boleto? boletoNormal = colectivo.PagarCon(tarjetaNormal);
                 Boleto? boletoMedio = colectivo.PagarCon(tarjetaMedio);
                 Assert.That(boletoNormal, Is.Not.Null);
