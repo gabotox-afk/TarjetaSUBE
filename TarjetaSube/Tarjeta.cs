@@ -11,8 +11,9 @@ namespace TarjetaSube
     {
         public int Id { get; set; }
         public decimal Saldo { get; private set; }
-        public const decimal LimiteSaldo = 40000;
+        public const decimal LimiteSaldo = 56000;
         public const decimal SaldoNegativoPermitido = 2000;
+        public decimal SaldoPendiente { get; private set; } = 0;
         private static readonly List<decimal> CargasValidas = new List<decimal>() { 2000, 3000, 4000, 5000, 8000, 10000, 15000, 20000, 25000, 30000 };
 
         public int TarjetaTipoId { get; set; } = TarjetaTipo.NormalId;
@@ -70,20 +71,42 @@ namespace TarjetaSube
                 _viajesGratuitosPorDia[hoy] = 1;
         }
 
+        /// <summary>
+        /// Acredita en el saldo todo lo que quepa hasta el límite máximo.
+        /// El excedente queda almacenado en SaldoPendiente para acreditarse
+        /// a medida que se libere espacio con el uso de la tarjeta.
+        /// </summary>
+        public void AcreditarCarga(decimal monto)
+        {
+            decimal espacioDisponible = LimiteSaldo - Saldo;
+
+            if (espacioDisponible <= 0)
+            {
+                SaldoPendiente += monto;
+                return;
+            }
+
+            if (monto <= espacioDisponible)
+            {
+                Saldo += monto;
+            }
+            else
+            {
+                Saldo += espacioDisponible;
+                SaldoPendiente += monto - espacioDisponible;
+            }
+        }
+
         public void Cargar(decimal monto)
         {
             if (!CargasValidas.Contains(monto))
             {
                 return;
             }
-            
-            if((Saldo + monto)> LimiteSaldo)
-            {
-                return;
-            }
-            Saldo += monto;
-        
+
+            AcreditarCarga(monto);
         }
+
 
         public bool Descontar(decimal monto)
         {
@@ -103,6 +126,19 @@ namespace TarjetaSube
             }
 
             Saldo -= monto;
+
+            // Si hay saldo pendiente, acreditar lo que quepa tras el descuento
+            if (SaldoPendiente > 0)
+            {
+                decimal espacioDisponible = LimiteSaldo - Saldo;
+                decimal aAcreditar = Math.Min(SaldoPendiente, espacioDisponible);
+                if (aAcreditar > 0)
+                {
+                    Saldo += aAcreditar;
+                    SaldoPendiente -= aAcreditar;
+                }
+            }
+
             return true;
         }
     }

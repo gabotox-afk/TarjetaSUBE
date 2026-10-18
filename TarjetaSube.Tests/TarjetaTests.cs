@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
@@ -42,12 +42,13 @@ namespace TarjetaSube.Tests
 
         [Test]
 
-        public void CargaInvalida_SuperaElLimiteMaximo_NoSeAcredita()
+        public void CargaInvalida_SuperaElLimiteMaximo_AcreditaHastaElLimiteYDejaExcedentePendiente()
         {
             var tarjeta = new Tarjeta();
             tarjeta.Cargar(30000);
-            tarjeta.Cargar(15000);
-            Assert.That(tarjeta.Saldo, Is.EqualTo(30000));
+            tarjeta.Cargar(30000); // 30000 + 30000 = 60000 > 56000 → acredita 26000, pendiente = 4000
+            Assert.That(tarjeta.Saldo, Is.EqualTo(Tarjeta.LimiteSaldo));
+            Assert.That(tarjeta.SaldoPendiente, Is.EqualTo(4000));
         }
 
         [Test]
