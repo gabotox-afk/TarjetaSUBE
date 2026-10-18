@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,7 +28,11 @@ namespace TarjetaSube
                 throw new ArgumentNullException(nameof(tarjeta));
             }
 
-            decimal montoAPagar = tarjeta.CalcularPasaje(Tarifa);
+            bool esBoletoGratuito = tarjeta.EsBoletoGratuitoEstudiantil();
+            bool superaLimite = esBoletoGratuito
+                && tarjeta.ContarViajesGratuitosHoy() >= Tarjeta.LimiteViajesGratuitosPorDia;
+
+            decimal montoAPagar = superaLimite ? Tarifa : tarjeta.CalcularPasaje(Tarifa);
 
             decimal saldoPrevio = tarjeta.Saldo;
             decimal totalAbonado = montoAPagar;
@@ -41,6 +45,11 @@ namespace TarjetaSube
             {
 
                 return null;
+            }
+
+            if (esBoletoGratuito && !superaLimite)
+            {
+                tarjeta.RegistrarViajeGratuito();
             }
 
             return new Boleto(this, tarjeta, montoAPagar, tarjeta.Saldo, totalAbonado);
