@@ -18,6 +18,8 @@ namespace TarjetaSube
         public int TarjetaTipoId { get; set; } = TarjetaTipo.NormalId;
         public TarjetaTipo? TarjetaTipo { get; set; }
 
+        public const int LimiteViajesGratuitosPorDia = 2;
+        private readonly Dictionary<DateTime, int> _viajesGratuitosPorDia = new Dictionary<DateTime, int>();
 
         public Tarjeta()
         {
@@ -45,6 +47,27 @@ namespace TarjetaSube
                 return tarifa;
 
             return TarjetaTipo.CalcularPrecio(tarifa);
+        }
+
+        public bool EsBoletoGratuitoEstudiantil()
+        {
+            return TarjetaTipoId == TarjetaTipo.BoletoGratuitoEstudiantilId
+                || (TarjetaTipo != null && TarjetaTipo.Id == TarjetaTipo.BoletoGratuitoEstudiantilId);
+        }
+
+        public int ContarViajesGratuitosHoy()
+        {
+            var hoy = DateTime.Today;
+            return _viajesGratuitosPorDia.TryGetValue(hoy, out int count) ? count : 0;
+        }
+
+        public void RegistrarViajeGratuito()
+        {
+            var hoy = DateTime.Today;
+            if (_viajesGratuitosPorDia.ContainsKey(hoy))
+                _viajesGratuitosPorDia[hoy]++;
+            else
+                _viajesGratuitosPorDia[hoy] = 1;
         }
 
         public void Cargar(decimal monto)

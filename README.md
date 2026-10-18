@@ -1,8 +1,8 @@
 # Trabajo Tarjeta 2026
 
 ## Integrantes del grupo
- - Moreno Gabriel
- - Ferrer Petit Manuel
+ - Apellido y nombre
+ - Apellido y nombre
 
 ## Aclaraciones
 El siguiente trabajo es un enunciado iterativo. Regularmente se ampliará y/o modificará el enunciado.
