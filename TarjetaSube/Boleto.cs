@@ -13,18 +13,45 @@ namespace TarjetaSube
         public DateTime Fecha { get; set; }
         public decimal SaldoRestante { get; set; }
         public string Linea { get; set; } = string.Empty;
+        public string Tipo { get; set; } = string.Empty;
+        public decimal Abonado { get; set; }
 
         public int TarjetaId { get; set; }
         public Tarjeta? Tarjeta { get; set; }
         public int ColectivoId { get; set; }
         public Colectivo? Colectivo { get; set; }
 
+        public DateTime ObtenerFecha() { 
+            return Fecha;
+        }
+
+        public string ObtenerTipoTarjeta() {
+            return Tipo;
+        }
+
+        public string ObtenerLinea()
+        {
+            return Linea;
+        }
+        public decimal ObtenerTotalAbonado()
+        {
+            return Abonado;
+        }
+        public decimal ObtenerSaldo()
+        {
+            return SaldoRestante;
+        }
+        public int ObtenerTarjetaId()
+        {
+            return TarjetaId;
+        }
+
         public Boleto()
         {
 
         }
 
-        public Boleto (Colectivo colectivo, Tarjeta tarjeta, decimal tarifa, decimal saldoRestante)
+        public Boleto (Colectivo colectivo, Tarjeta tarjeta, decimal tarifa, decimal saldoRestante, decimal? totalAbonado = null)
         {
             Colectivo = colectivo;
             Linea = colectivo.Linea;
@@ -36,6 +63,10 @@ namespace TarjetaSube
             Tarifa = tarifa;
             SaldoRestante = saldoRestante;
             Fecha = DateTime.Now;
+
+            Tipo = tarjeta.TarjetaTipo?.Nombre ?? "Normal";
+
+            Abonado = totalAbonado ?? tarifa;
         }
     }
 }

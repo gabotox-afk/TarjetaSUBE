@@ -30,13 +30,20 @@ namespace TarjetaSube
 
             decimal montoAPagar = tarjeta.CalcularPasaje(Tarifa);
 
+            decimal saldoPrevio = tarjeta.Saldo;
+            decimal totalAbonado = montoAPagar;
+            if (saldoPrevio < 0)
+            {
+                totalAbonado = montoAPagar + Math.Abs(saldoPrevio);
+            }
+
             if (!tarjeta.Descontar(montoAPagar))
             {
 
                 return null;
             }
 
-            return new Boleto(this, tarjeta, montoAPagar, tarjeta.Saldo);
+            return new Boleto(this, tarjeta, montoAPagar, tarjeta.Saldo, totalAbonado);
 
         }
         public bool pagarCon(Tarjeta tarjeta) => PagarCon(tarjeta) != null;
