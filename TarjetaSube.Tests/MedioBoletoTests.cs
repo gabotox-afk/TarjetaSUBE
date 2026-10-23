@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using TarjetaSube;
 
@@ -42,7 +42,7 @@ namespace TarjetaSube.Tests
             // 1er viaje a las 8:00 -> Exitoso
             Boleto? primerViaje = colectivo.PagarCon(tarjeta);
             Assert.That(primerViaje, Is.Not.Null);
-            Assert.That(primerViaje!.Tarifa, Is.EqualTo(790));
+            Assert.That(primerViaje!.Tarifa, Is.EqualTo(1075));
 
             // Adelantamos 3 minutos (8:03)
             _reloj.AvanzarMinutos(3);
@@ -50,7 +50,7 @@ namespace TarjetaSube.Tests
             // 2do viaje -> Debe rebotar porque no pasaron 5 minutos
             Boleto? intentoRechazado = colectivo.PagarCon(tarjeta);
             Assert.That(intentoRechazado, Is.Null);
-            Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 790)); // El saldo no se tocó
+            Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 1075)); // El saldo no se tocó
         }
 
         // Test 2: Permitir viajar si ya pasaron 5 minutos o más
@@ -70,8 +70,8 @@ namespace TarjetaSube.Tests
             // 2do viaje -> Debe permitirse
             Boleto? segundoViaje = colectivo.PagarCon(tarjeta);
             Assert.That(segundoViaje, Is.Not.Null);
-            Assert.That(segundoViaje!.Tarifa, Is.EqualTo(790));
-            Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 790 * 2));
+            Assert.That(segundoViaje!.Tarifa, Is.EqualTo(1075));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(5000 - 1075 * 2));
         }
 
         // Test 3: Máximo 2 viajes por día con descuento, el 3ro cobra tarifa normal
@@ -82,20 +82,20 @@ namespace TarjetaSube.Tests
             var tipoMedio = new TarjetaTipo("Medio boleto estudiantil", 50);
             var tarjeta = new Tarjeta(10000, tipoMedio);
 
-            // 1er viaje (8:00): $790
+            // 1er viaje (8:00): $790 - post iteracion 4 ($1075)
             Boleto? b1 = colectivo.PagarCon(tarjeta);
-            Assert.That(b1!.Tarifa, Is.EqualTo(790));
+            Assert.That(b1!.Tarifa, Is.EqualTo(1075));
 
-            // 2do viaje (8:10): $790
+            // 2do viaje (8:10): $790 - post iteracion 4 ($1075)
             _reloj.AvanzarMinutos(10);
             Boleto? b2 = colectivo.PagarCon(tarjeta);
-            Assert.That(b2!.Tarifa, Is.EqualTo(790));
+            Assert.That(b2!.Tarifa, Is.EqualTo(1075));
 
-            // 3er viaje (8:30): ya no hay descuento, cobra tarifa normal $1580
+            // 3er viaje (8:30): ya no hay descuento, cobra tarifa normal $1580 - post iteracion 4 ($2150)
             _reloj.AvanzarMinutos(20);
             Boleto? b3 = colectivo.PagarCon(tarjeta);
             Assert.That(b3, Is.Not.Null);
-            Assert.That(b3!.Tarifa, Is.EqualTo(1580)); // Tarifa normal
+            Assert.That(b3!.Tarifa, Is.EqualTo(2150)); // Tarifa normal
         }
 
         // Test 4: Al día siguiente vuelve a tener 2 viajes con medio boleto
@@ -114,9 +114,9 @@ namespace TarjetaSube.Tests
             // Avanzamos al día siguiente
             _reloj.AvanzarDias(1);
 
-            // 1er viaje del nuevo día: vuelve a costar la mitad ($790)
+            // 1er viaje del nuevo día: vuelve a costar la mitad ($790) - post iteracion 4 ($1075)
             Boleto? bNuevoDia = colectivo.PagarCon(tarjeta);
-            Assert.That(bNuevoDia!.Tarifa, Is.EqualTo(790));
+            Assert.That(bNuevoDia!.Tarifa, Is.EqualTo(1075));
         }
     }
 }
