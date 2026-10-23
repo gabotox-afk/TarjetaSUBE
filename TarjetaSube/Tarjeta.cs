@@ -166,6 +166,18 @@ namespace TarjetaSube
                     return false;
                 }
             }
+
+            if (EsFranquicia)
+            {
+                bool esDiaHabil = fecha.DayOfWeek >= DayOfWeek.Monday && fecha.DayOfWeek <= DayOfWeek.Friday;
+                bool esHorarioValido = fecha.TimeOfDay >= new TimeSpan(6, 0, 0) && fecha.TimeOfDay <= new TimeSpan(22, 0, 0);
+
+                if (!esDiaHabil || !esHorarioValido)
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
 
@@ -173,5 +185,8 @@ namespace TarjetaSube
         {
             Viajes.Add(fecha);
         }
+
+        public bool EsFranquicia => TarjetaTipo != null && TarjetaTipo.Id != TarjetaTipo.NormalId && !string.Equals(TarjetaTipo.Nombre, "Normal", StringComparison.OrdinalIgnoreCase);
+
     }
 }
