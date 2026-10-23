@@ -4,16 +4,6 @@ using TarjetaSube;
 
 namespace TarjetaSube.Tests
 {
-    // Reloj simulado para avanzar el tiempo en los tests
-    public class RelojFalso : ITiempo
-    {
-        public DateTime FechaActual { get; set; } = new DateTime(2026, 10, 18, 8, 0, 0);
-        public DateTime Ahora => FechaActual;
-
-        public void AvanzarMinutos(int minutos) => FechaActual = FechaActual.AddMinutes(minutos);
-        public void AvanzarDias(int dias) => FechaActual = FechaActual.AddDays(dias);
-    }
-
     public class MedioBoletoTests
     {
         private RelojFalso _reloj = null!;
@@ -21,14 +11,14 @@ namespace TarjetaSube.Tests
         [SetUp]
         public void Setup()
         {
-            _reloj = new RelojFalso();
+            _reloj = new RelojFalso(new DateTime(2026, 10, 19, 8, 0, 0));
             Tiempo.Actual = _reloj; // Usamos el reloj falso para los tests
         }
 
         [TearDown]
         public void TearDown()
         {
-            Tiempo.Actual = new TiempoSistema(); // Restauramos el reloj real al terminar
+            Tiempo.Actual = new RelojFalso(); // Restauramos el reloj simulado por defecto
         }
 
         // Test 1: No permitir viajar si pasaron menos de 5 minutos
