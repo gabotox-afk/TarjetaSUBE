@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using TarjetaSube;
 
@@ -19,8 +19,8 @@ namespace TarjetaSube.Tests
             Assert.That(boleto!.ObtenerFecha(), Is.EqualTo(DateTime.Now).Within(TimeSpan.FromSeconds(5)));
             Assert.That(boleto.ObtenerTipoTarjeta(), Is.EqualTo("Normal"));
             Assert.That(boleto.ObtenerLinea(), Is.EqualTo("122 Verde"));
-            Assert.That(boleto.ObtenerTotalAbonado(), Is.EqualTo(1580));
-            Assert.That(boleto.ObtenerSaldo(), Is.EqualTo(5000 - 1580));
+            Assert.That(boleto.ObtenerTotalAbonado(), Is.EqualTo(2150));
+            Assert.That(boleto.ObtenerSaldo(), Is.EqualTo(5000 - 2150));
             Assert.That(boleto.ObtenerTarjetaId(), Is.EqualTo(42));
         }
 
@@ -35,8 +35,8 @@ namespace TarjetaSube.Tests
 
             Assert.That(boleto, Is.Not.Null);
             Assert.That(boleto!.ObtenerTipoTarjeta(), Is.EqualTo("Medio boleto estudiantil"));
-            Assert.That(boleto.ObtenerTotalAbonado(), Is.EqualTo(790));
-            Assert.That(boleto.ObtenerSaldo(), Is.EqualTo(3000 - 790));
+            Assert.That(boleto.ObtenerTotalAbonado(), Is.EqualTo(1075));
+            Assert.That(boleto.ObtenerSaldo(), Is.EqualTo(3000 - 1075));
         }
 
         [Test]
@@ -72,30 +72,30 @@ namespace TarjetaSube.Tests
         public void Boleto_ConSaldoNegativoPrevio_InformaTotalAbonadoSuperiorATarifaNormal()
         {
             var colectivo = new Colectivo("122 Verde");
-            var tarjeta = new Tarjeta(); 
+            var tarjeta = new Tarjeta(500); 
 
             colectivo.PagarCon(tarjeta);
-            Assert.That(tarjeta.Saldo, Is.EqualTo(-1580));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(-1650));
 
 
             tarjeta.Cargar(2000);
-            Assert.That(tarjeta.Saldo, Is.EqualTo(420));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(350));
 
             var tarjetaConDeuda = new Tarjeta(1000);
        
             colectivo.PagarCon(tarjetaConDeuda);
-            Assert.That(tarjetaConDeuda.Saldo, Is.EqualTo(-580));
+            Assert.That(tarjetaConDeuda.Saldo, Is.EqualTo(-1150));
 
-
-            var tarjetaConDeudaChica = new Tarjeta(1380);
-            colectivo.PagarCon(tarjetaConDeudaChica); 
+            var colectivoEspecial = new Colectivo("122 Verde", 1000);
+            var tarjetaConDeudaChica = new Tarjeta(800);
+            colectivoEspecial.PagarCon(tarjetaConDeudaChica); 
             Assert.That(tarjetaConDeudaChica.Saldo, Is.EqualTo(-200));
 
-            Boleto? segundoBoleto = colectivo.PagarCon(tarjetaConDeudaChica);
+            Boleto? segundoBoleto = colectivoEspecial.PagarCon(tarjetaConDeudaChica);
 
             Assert.That(segundoBoleto, Is.Not.Null);
-            Assert.That(segundoBoleto!.ObtenerTotalAbonado(), Is.EqualTo(1580 + 200));
-            Assert.That(segundoBoleto.ObtenerTotalAbonado(), Is.GreaterThan(1580));
+            Assert.That(segundoBoleto!.ObtenerTotalAbonado(), Is.EqualTo(1000 + 200));
+            Assert.That(segundoBoleto.ObtenerTotalAbonado(), Is.GreaterThan(1000));
         }
     }
 }

@@ -10,11 +10,11 @@ namespace TarjetaSube
     {
         public int Id { get; set; }
         public string Linea { get; set; } = string.Empty;
-        public decimal Tarifa { get; set; } = 1580;
+        public decimal Tarifa { get; set; } = 2150;
 
         public Colectivo() { }
 
-        public Colectivo( string linea, decimal tarifa = 1580)
+        public Colectivo( string linea, decimal tarifa = 2150)
         {
             Linea = linea;
             Tarifa = tarifa;

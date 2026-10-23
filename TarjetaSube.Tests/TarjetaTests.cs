@@ -134,11 +134,11 @@ namespace TarjetaSube.Tests
 
             Boleto? boleto = colectivo.PagarCon(tarjeta);
             Assert.That(boleto, Is.Not.Null);
-            Assert.That(tarjeta.Saldo, Is.EqualTo(-580));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(-1150));
 
             tarjeta.Cargar(3000);
 
-            Assert.That(tarjeta.Saldo, Is.EqualTo(3000 - 580));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(3000 - 1150));
         }
     }
 }
