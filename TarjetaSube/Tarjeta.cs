@@ -61,7 +61,47 @@ namespace TarjetaSube
                 }
             }
 
-            return TarjetaTipo.CalcularPrecio(tarifa);
+            decimal precioConTipo = TarjetaTipo.CalcularPrecio(tarifa);
+
+            // El boleto de uso frecuente aplica solo a tarjetas de tipo Normal
+            if (EsTarjetaNormal())
+            {
+                decimal descuentoFrecuente = CalcularDescuentoUsoFrecuente(f);
+                if (descuentoFrecuente > 0)
+                    return precioConTipo * (100 - descuentoFrecuente) / 100;
+            }
+
+            return precioConTipo;
+        }
+
+        /// <summary>
+        /// Retorna el porcentaje de descuento por uso frecuente según los viajes realizados
+        /// en el mes de la fecha dada (del día 1 al último día del mes).
+        /// Viajes 1–29: 0% de descuento.
+        /// Viajes 30–79: 20% de descuento.
+        /// Viajes 80 en adelante: 25% de descuento.
+        /// El viaje actual (aún no registrado) se tiene en cuenta: si ya hay 29 registrados,
+        /// el próximo viaje es el 30 y aplica el 20%.
+        /// </summary>
+        public decimal CalcularDescuentoUsoFrecuente(DateTime? fecha = null)
+        {
+            DateTime f = fecha ?? Tiempo.Ahora;
+
+            // Contamos los viajes ya registrados; el viaje actual será el siguiente (viajesMes + 1).
+            int viajesMes = Viajes.Count(v => v.Year == f.Year && v.Month == f.Month);
+            int viajeActual = viajesMes + 1;
+
+            if (viajeActual >= 80)
+                return 25;
+            if (viajeActual >= 30)
+                return 20;
+            return 0;
+        }
+
+        public int ContarViajesMes(DateTime? fecha = null)
+        {
+            DateTime f = fecha ?? Tiempo.Ahora;
+            return Viajes.Count(v => v.Year == f.Year && v.Month == f.Month);
         }
 
         public bool EsBoletoGratuitoEstudiantil()
@@ -187,6 +227,12 @@ namespace TarjetaSube
         }
 
         public bool EsFranquicia => TarjetaTipo != null && TarjetaTipo.Id != TarjetaTipo.NormalId && !string.Equals(TarjetaTipo.Nombre, "Normal", StringComparison.OrdinalIgnoreCase);
+
+        public bool EsTarjetaNormal() =>
+            TarjetaTipo == null
+            || TarjetaTipoId == TarjetaTipo.NormalId
+            || (TarjetaTipo.PorcentajeDescuento == 0
+                && string.Equals(TarjetaTipo.Nombre, "Normal", StringComparison.OrdinalIgnoreCase));
 
     }
 }
