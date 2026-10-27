@@ -35,11 +35,22 @@ namespace TarjetaSube
                 return null;    
             }
 
+            // ── Trasbordo ─────────────────────────────────────────────────────────
+            bool esTrasbordo = tarjeta.CalificaComoTrasbordo(Linea, fechaActual);
+
             bool esBoletoGratuito = tarjeta.EsBoletoGratuitoEstudiantil();
             bool superaLimite = esBoletoGratuito
                 && tarjeta.ContarViajesGratuitosHoy() >= Tarjeta.LimiteViajesGratuitosPorDia;
 
-            decimal montoAPagar = superaLimite ? Tarifa : tarjeta.CalcularPasaje(Tarifa, fechaActual);
+            decimal montoAPagar;
+            if (esTrasbordo)
+            {
+                montoAPagar = 0;
+            }
+            else
+            {
+                montoAPagar = superaLimite ? Tarifa : tarjeta.CalcularPasaje(Tarifa, fechaActual);
+            }
 
             decimal saldoPrevio = tarjeta.Saldo;
             decimal totalAbonado = montoAPagar;
@@ -50,7 +61,6 @@ namespace TarjetaSube
 
             if (!tarjeta.Descontar(montoAPagar))
             {
-
                 return null;
             }
 
@@ -61,7 +71,17 @@ namespace TarjetaSube
                 tarjeta.RegistrarViajeGratuito();
             }
 
-            return new Boleto(this, tarjeta, montoAPagar, tarjeta.Saldo, totalAbonado);
+            // Actualizar ventana de trasbordo
+            if (esTrasbordo)
+            {
+                tarjeta.ActualizarLineaTrasbordo(Linea);
+            }
+            else
+            {
+                tarjeta.IniciarVentanaTrasbordo(Linea, fechaActual);
+            }
+
+            return new Boleto(this, tarjeta, montoAPagar, tarjeta.Saldo, totalAbonado, esTrasbordo);
 
         }
         public bool pagarCon(Tarjeta tarjeta) => PagarCon(tarjeta) != null;

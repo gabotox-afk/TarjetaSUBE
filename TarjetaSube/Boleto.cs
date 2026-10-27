@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +20,7 @@ namespace TarjetaSube
         public Tarjeta? Tarjeta { get; set; }
         public int ColectivoId { get; set; }
         public Colectivo? Colectivo { get; set; }
+        public bool EsTrasbordo { get; set; } = false;
 
         public DateTime ObtenerFecha() { 
             return Fecha;
@@ -51,7 +52,7 @@ namespace TarjetaSube
 
         }
 
-        public Boleto (Colectivo colectivo, Tarjeta tarjeta, decimal tarifa, decimal saldoRestante, decimal? totalAbonado = null)
+        public Boleto (Colectivo colectivo, Tarjeta tarjeta, decimal tarifa, decimal saldoRestante, decimal? totalAbonado = null, bool esTrasbordo = false)
         {
             Colectivo = colectivo;
             Linea = colectivo.Linea;
@@ -67,6 +68,7 @@ namespace TarjetaSube
             Tipo = tarjeta.TarjetaTipo?.Nombre ?? "Normal";
 
             Abonado = totalAbonado ?? tarifa;
+            EsTrasbordo = esTrasbordo;
         }
     }
 }
