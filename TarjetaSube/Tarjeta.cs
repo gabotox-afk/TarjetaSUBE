@@ -25,6 +25,14 @@ namespace TarjetaSube
         public const int LimiteViajesGratuitosPorDia = 2;
         private readonly Dictionary<DateTime, int> _viajesGratuitosPorDia = new Dictionary<DateTime, int>();
 
+        // Estado del trasbordo: ventana de 1 hora desde el primer boleto
+        private DateTime? _inicioTrasbordo;
+        private string? _ultimaLineaTrasbordo;
+
+        public static readonly TimeSpan VentanaTrasbordo = TimeSpan.FromHours(1);
+        private static readonly TimeSpan HorarioTrasbordoInicio = new TimeSpan(7, 0, 0);
+        private static readonly TimeSpan HorarioTrasbordoFin   = new TimeSpan(22, 0, 0);
+
         public Tarjeta()
         {
             Saldo = 0;
@@ -233,6 +241,53 @@ namespace TarjetaSube
             || TarjetaTipoId == TarjetaTipo.NormalId
             || (TarjetaTipo.PorcentajeDescuento == 0
                 && string.Equals(TarjetaTipo.Nombre, "Normal", StringComparison.OrdinalIgnoreCase));
+
+        // ─── Trasbordos ───────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Indica si el viaje en <paramref name="linea"/> a la hora <paramref name="fecha"/>
+        /// califica como trasbordo gratuito:
+        ///   – Existe una ventana de trasbordo activa (se pagó al menos un boleto previo).
+        ///   – Han pasado menos de 1 hora desde el primer boleto de la ventana.
+        ///   – La línea es distinta a la del último viaje realizado.
+        ///   – Es de lunes a sábado entre las 07:00 y las 22:00.
+        /// </summary>
+        public bool CalificaComoTrasbordo(string linea, DateTime fecha)
+        {
+            if (_inicioTrasbordo == null)
+                return false;
+
+            if ((fecha - _inicioTrasbordo.Value) > VentanaTrasbordo)
+                return false;
+
+            if (string.Equals(linea, _ultimaLineaTrasbordo, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            bool esDiaValido = fecha.DayOfWeek >= DayOfWeek.Monday && fecha.DayOfWeek <= DayOfWeek.Saturday;
+            bool esHorarioValido = fecha.TimeOfDay >= HorarioTrasbordoInicio && fecha.TimeOfDay <= HorarioTrasbordoFin;
+
+            return esDiaValido && esHorarioValido;
+        }
+
+        /// <summary>
+        /// Inicia (o reinicia) la ventana de trasbordo con el boleto pagado en
+        /// <paramref name="linea"/> a la hora <paramref name="fecha"/>.
+        /// Se llama cuando el viaje NO es un trasbordo (boleto normal).
+        /// </summary>
+        public void IniciarVentanaTrasbordo(string linea, DateTime fecha)
+        {
+            _inicioTrasbordo = fecha;
+            _ultimaLineaTrasbordo = linea;
+        }
+
+        /// <summary>
+        /// Actualiza la última línea recorrida dentro de la ventana de trasbordo activa.
+        /// Se llama cuando el viaje SÍ es un trasbordo.
+        /// </summary>
+        public void ActualizarLineaTrasbordo(string linea)
+        {
+            _ultimaLineaTrasbordo = linea;
+        }
 
     }
 }
