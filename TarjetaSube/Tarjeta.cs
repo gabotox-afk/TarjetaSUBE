@@ -33,6 +33,11 @@ namespace TarjetaSube
         private static readonly TimeSpan HorarioTrasbordoInicio = new TimeSpan(7, 0, 0);
         private static readonly TimeSpan HorarioTrasbordoFin   = new TimeSpan(22, 0, 0);
 
+        // Mi Bici tu Bici
+        private readonly HashSet<DateTime> diasServicioBiciPagado = new();
+        public DateTime? InicioUsoBici { get; private set; }
+        public bool TieneBiciRetirada => InicioUsoBici.HasValue;
+
         public Tarjeta()
         {
             Saldo = 0;
@@ -288,6 +293,22 @@ namespace TarjetaSube
         {
             _ultimaLineaTrasbordo = linea;
         }
-
+        // Mi bici tu bici
+        public bool TieneServicioBiciPagado(DateTime fecha)
+        {
+            return diasServicioBiciPagado.Contains(fecha.Date);
+        }
+        public void RegistrarPagoServicioBici(DateTime fecha)
+        {
+            diasServicioBiciPagado.Add(fecha.Date);
+        }
+        public void RegistrarRetiroBici(DateTime fecha)
+        {
+            InicioUsoBici = fecha;
+        }
+        public void RegistrarDevolucionBici(DateTime fecha)
+        {
+            InicioUsoBici = null;
+        }
     }
 }
