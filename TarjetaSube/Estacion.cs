@@ -10,24 +10,24 @@ namespace TarjetaSube
     {
         public int Id { get; set; }
         public const decimal TarifaServicio = 2418.75m;
+        public const decimal MultaPorDemora = 1250m;
+        public static readonly TimeSpan TiempoMaximoUso = TimeSpan.FromHours(1);
         
         public bool RetirarBici(Tarjeta tarjeta)
         {
-            if (tarjeta == null) return false;
+            if (tarjeta == null || tarjeta.TieneBiciRetirada) return false;
 
             DateTime fechaActual = Tiempo.Ahora;
             bool yaPagoHoy = tarjeta.TieneServicioBiciPagado(fechaActual);
-            decimal MontoAPagar = yaPagoHoy ? 0 : TarifaServicio;
+            decimal montoAPagar = (yaPagoHoy ? 0 : TarifaServicio) + tarjeta.MultasBiciPendientes;
 
-            if (MontoAPagar > 0)
+            if (tarjeta.Saldo < montoAPagar || !tarjeta.Descontar(montoAPagar))
             {
-                if (!tarjeta.Descontar(MontoAPagar))
-                {
-                    return false;
-                }
+                return false;
             }
 
             tarjeta.RegistrarPagoServicioBici(fechaActual);
+            tarjeta.SaldarMultasBici();
             tarjeta.RegistrarRetiroBici(fechaActual);
             return true;
         }
@@ -41,8 +41,18 @@ namespace TarjetaSube
             }
 
             DateTime fechaActual = Tiempo.Ahora;
+            if (fechaActual - tarjeta.InicioUsoBici!.Value > TiempoMaximoUso)
+            {
+                tarjeta.RegistrarMultaBici(MultaPorDemora);
+            }
+
             tarjeta.RegistrarDevolucionBici(fechaActual);
             return true;
+        }
+
+        public bool DevolverBicicleta(Tarjeta tarjeta)
+        {
+            return DevolverBici(tarjeta);
         }
     }
 }
