@@ -37,6 +37,7 @@ namespace TarjetaSube
         private readonly HashSet<DateTime> diasServicioBiciPagado = new();
         public DateTime? InicioUsoBici { get; private set; }
         public bool TieneBiciRetirada => InicioUsoBici.HasValue;
+        public decimal MultasBiciPendientes { get; private set; }
 
         public Tarjeta()
         {
@@ -309,6 +310,17 @@ namespace TarjetaSube
         public void RegistrarDevolucionBici(DateTime fecha)
         {
             InicioUsoBici = null;
+        }
+        public void RegistrarMultaBici(decimal monto)
+        {
+            if (monto < 0)
+                throw new ArgumentOutOfRangeException(nameof(monto));
+
+            MultasBiciPendientes += monto;
+        }
+        public void SaldarMultasBici()
+        {
+            MultasBiciPendientes = 0;
         }
     }
 }
